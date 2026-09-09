@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geogasto - Control Inteligente de Gastos</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <h1>Geogasto Geolocalizado</h1>
+        <nav>
+            <ul>
+                <li><a href="#registro">Registrar Gasto</a></li>
+                <li><a href="#mapa">Mapa de Consumo</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="registro">
+            <h2>Nuevo Registro de Gasto</h2>
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="descripcion">Descripción del Gasto:</label>
+                    <input type="text" id="descripcion" name="descripcion" required placeholder="Ej. Almuerzo de trabajo">
+                </div>
+
+                <div class="form-group">
+                    <label for="monto">Monto (S/.):</label>
+                    <input type="number" id="monto" name="monto" step="0.01" min="0" required placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Seleccione...</option>
+                        <option value="alimentacion">Alimentación</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="ocio">Ocio</option>
+                    </select>
+                </div>
+
+                <button type="submit">Guardar Gasto</button>
+            </form>
+        </section>
+
+        <section id="mapa">
+            <h2>Ubicación Geográfica en Tiempo Real</h2>
+            <article>
+                <p>El mapa interactivo mostrará los puntos exactos de tus consumos diarios usando geolocalización.</p>
+                <div class="map-placeholder">Simulación de Mapa Interactivo</div>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 - Geogasto System</p>
+    </footer>
+</body>
+</html>
