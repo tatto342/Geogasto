@@ -1,73 +1,140 @@
+
 package com.controlgastos.controller;
 
 import com.controlgastos.model.Gasto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.controlgastos.repository.GastoRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/gastos")
 public class GastoController {
 
-    private final List<Gasto> gastos = new ArrayList<>();
+    private final GastoRepository gastoRepository;
 
-    public GastoController() {
-        // Datos de ejemplo en memoria
-        gastos.add(new Gasto(1L, "Almuerzo en el centro", 25.50,
-                -12.0464, -77.0428, LocalDateTime.now(), "Alimentación"));
-        gastos.add(new Gasto(2L, "Taxi a la oficina", 15.00,
-                -12.0892, -77.0334, LocalDateTime.now(), "Transporte"));
-        gastos.add(new Gasto(3L, "Cena con amigos", 45.00,
-                -12.1284, -77.0303, LocalDateTime.now(), "Ocio"));
-        gastos.add(new Gasto(4L, "Farmacia", 32.50,
-                -12.0567, -77.0389, LocalDateTime.now(), "Salud"));
-        gastos.add(new Gasto(5L, "Curso de inglés", 120.00,
-                -12.0709, -77.0411, LocalDateTime.now(), "Educación"));
+    public GastoController(GastoRepository gastoRepository) {
+        this.gastoRepository = gastoRepository;
     }
 
+    // Listar todos los gastos
     @GetMapping
     public List<Gasto> listarGastos() {
-        return gastos;
+        return gastoRepository.findAll();
     }
 
-
+    // Buscar un gasto por su ID
     @GetMapping("/{id}")
-    public Gasto obtenerGasto(@PathVariable Long id) {
-        for (Gasto g : gastos) {
-            if (g.getId().equals(id)) {
-                return g;
-            }
-        }
-        return null;
+    public ResponseEntity<Gasto> obtenerGasto(@PathVariable Long id) {
+        return gastoRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Mensaje de bienvenida
     @GetMapping("/bienvenida")
     public String bienvenida() {
         return "Bienvenido a GeoGasto - Sistema de Control de Gastos";
     }
 
-
+    // Calcular el total de gastos
     @GetMapping("/total")
     public String total() {
-        double total = gastos.stream()
-                .mapToDouble(Gasto::getMonto)
+        double total = gastoRepository.findAll()
+                .stream()
+                .mapToDouble(g -> g.getMonto() != null ? g.getMonto() : 0.0)
                 .sum();
+
         return "Total gastado: S/ " + String.format("%.2f", total);
     }
 
+    // Filtrar por categoría
     @GetMapping("/categoria/{categoria}")
     public List<Gasto> porCategoria(@PathVariable String categoria) {
-        List<Gasto> resultado = new ArrayList<>();
-        for (Gasto g : gastos) {
-            if (g.getCategoria().equalsIgnoreCase(categoria)) {
-                resultado.add(g);
-            }
+        return gastoRepository.findByCategoriaIgnoreCase(categoria);
+    }
+
+    // Registrar un gasto
+    @PostMapping
+    public ResponseEntity<?> registrarGasto(@RequestBody Gasto gasto) {
+
+        if (gasto.getDescripcion() == null
+                || gasto.getDescripcion().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "La descripción es obligatoria"));
         }
-        return resultado;
+
+        if (gasto.getMonto() == null || gasto.getMonto() <= 0) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "El monto debe ser mayor que cero"));
+        }
+
+        if (gasto.getCategoria() == null
+                || gasto.getCategoria().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "La categoría es obligatoria"));
+        }
+
+        gasto.setId(null);
+
+        Gasto guardado = gastoRepository.save(gasto);
+
+        return ResponseEntity.status(201).body(guardado);
+    }
+
+    // Actualizar un gasto
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarGasto(
+            @PathVariable Long id,
+            @RequestBody Gasto datos) {
+
+        var encontrado = gastoRepository.findById(id);
+
+        if (encontrado.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (datos.getDescripcion() == null
+                || datos.getDescripcion().isBlank()
+                || datos.getMonto() == null
+                || datos.getMonto() <= 0
+                || datos.getCategoria() == null
+                || datos.getCategoria().isBlank()) {
+
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error",
+                            "Revisa la descripción, el monto y la categoría"));
+        }
+
+        Gasto gasto = encontrado.get();
+
+        gasto.setDescripcion(datos.getDescripcion());
+        gasto.setMonto(datos.getMonto());
+        gasto.setCategoria(datos.getCategoria());
+        gasto.setLatitud(datos.getLatitud());
+        gasto.setLongitud(datos.getLongitud());
+
+        if (datos.getFecha() != null) {
+            gasto.setFecha(datos.getFecha());
+        }
+
+        Gasto actualizado = gastoRepository.save(gasto);
+
+        return ResponseEntity.ok(actualizado);
+    }
+
+    // Eliminar un gasto
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarGasto(@PathVariable Long id) {
+
+        if (!gastoRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        gastoRepository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
