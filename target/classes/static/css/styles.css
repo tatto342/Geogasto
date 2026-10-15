@@ -1,0 +1,207 @@
+
+/* Colores de GeoGasto */
+
+:root {
+    --geo-verde-oscuro: #064e3b;
+    --geo-verde: #198754;
+    --geo-verde-claro: #d1fae5;
+}
+
+/* Página */
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #26332d;
+}
+
+/* Encabezado */
+
+.encabezado {
+    background: linear-gradient(
+        135deg,
+        var(--geo-verde-oscuro),
+        #087f5b
+    );
+}
+
+.icono-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 1.8rem;
+}
+
+/* Navegación */
+
+.navbar {
+    z-index: 1000;
+}
+
+.navbar .nav-link {
+    color: var(--geo-verde-oscuro);
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 9px 12px;
+    transition: background-color 0.2s;
+}
+
+.navbar .nav-link:hover {
+    color: var(--geo-verde-oscuro);
+    background: var(--geo-verde-claro);
+}
+
+/* Bienvenida */
+
+#inicio {
+    border-radius: 14px;
+    border-top: 4px solid #20c997 !important;
+}
+
+.icono-bienvenida {
+    font-size: 5rem;
+    color: #198754;
+    opacity: 0.8;
+}
+
+/* Tarjetas */
+
+.card {
+    border-radius: 14px;
+}
+
+.card-body {
+    min-width: 0;
+}
+
+/* Formularios */
+
+.form-control,
+.form-select,
+.input-group-text {
+    border-color: #d8e2dc;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #20a875;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+}
+
+.form-label {
+    color: #26332d;
+}
+
+/* Botones */
+
+.btn-success {
+    background-color: var(--geo-verde);
+    border-color: var(--geo-verde);
+}
+
+.btn-success:hover {
+    background-color: var(--geo-verde-oscuro);
+    border-color: var(--geo-verde-oscuro);
+}
+
+/* Mapa */
+
+#mapa-gasto {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    border: 1px solid #d8e2dc;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Lista */
+
+#lista-gastos {
+    padding-left: 0;
+}
+
+#lista-gastos .list-group-item {
+    padding: 16px 12px;
+    border-color: #e5ece7;
+    overflow-wrap: anywhere;
+}
+
+#lista-gastos li strong {
+    color: var(--geo-verde-oscuro);
+    font-size: 1.05rem;
+}
+
+#lista-gastos li div {
+    color: #64748b;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+/* Botones de eliminar creados por app.js */
+
+#lista-gastos .btn-primario {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 0.875rem;
+}
+
+#lista-gastos .btn-primario:hover {
+    background: #bb2d3b;
+}
+
+/* Mensaje de lista vacía */
+
+#lista-gastos .vacio {
+    text-align: center;
+    color: #64748b;
+    padding: 28px 12px;
+    border: 1px dashed #cedbd2;
+    border-radius: 8px;
+}
+
+/* Pie de página */
+
+footer {
+    background: var(--geo-verde-oscuro);
+}
+
+/* Adaptación para celulares */
+
+@media (max-width: 575.98px) {
+    .encabezado {
+        padding: 22px 0 !important;
+    }
+
+    .icono-logo {
+        width: 46px;
+        height: 46px;
+        font-size: 1.5rem;
+    }
+
+    .navbar .nav-link {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    main.container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    #mapa-gasto {
+        height: 250px;
+    }
+}

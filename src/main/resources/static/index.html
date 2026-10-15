@@ -1,74 +1,331 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>GeoGasto - Control de Gastos</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <!-- CSS propio -->
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
 
-<header>
-    <h1>GeoGasto</h1>
-    <p>Sistema Inteligente de Control de Gastos</p>
-</header>
+<body class="bg-light">
 
-<nav>
-    <ul>
-        <li><a href="#inicio">Inicio</a></li>
-        <li><a href="#registrar">Registrar</a></li>
-        <li><a href="#lista">Mis Gastos</a></li>
-    </ul>
-</nav>
+    <!-- ENCABEZADO -->
+    <header class="encabezado text-white py-4">
+        <div class="container">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icono-logo">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
 
-<main>
-    <section id="inicio">
-        <h2>Bienvenido</h2>
-        <p>Registra y visualiza tus gastos de manera inteligente.</p>
-    </section>
+                <div>
+                    <h1 class="h2 fw-bold mb-1">GeoGasto</h1>
+                    <p class="mb-0 text-white-50">
+                        Control inteligente de gastos
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <section id="registrar">
-        <h2>Registrar Nuevo Gasto</h2>
-        <form id="form-gasto">
-            <div class="campo">
-                <label for="descripcion">Descripción:</label>
-                <input type="text" id="descripcion" required maxlength="255"
-                       placeholder="Ej. Almuerzo en el centro">
+    <!-- NAVEGACIÓN -->
+    <nav class="navbar navbar-expand navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <div class="navbar-nav flex-row gap-2">
+                <a class="nav-link" href="#inicio">
+                    <i class="bi bi-house me-1"></i>
+                    Inicio
+                </a>
+
+                <a class="nav-link" href="#registrar">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Registrar
+                </a>
+
+                <a class="nav-link" href="#lista">
+                    <i class="bi bi-receipt me-1"></i>
+                    Mis gastos
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+
+        <!-- BIENVENIDA Y TOTAL -->
+        <div class="row g-4 mb-4">
+
+            <!-- BIENVENIDA A LA IZQUIERDA -->
+            <div class="col-12 col-lg-7">
+                <section
+                    id="inicio"
+                    class="card border-0 shadow-sm h-100"
+                >
+                    <div class="card-body p-4 d-flex flex-column justify-content-center">
+
+                  
+
+                        <h2 class="h3 fw-bold mb-2">
+                            Administra tus gastos fácilmente
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            Registra tus compras, organiza tus categorías
+                            y guarda la ubicación de cada gasto.
+                        </p>
+
+                     
+
+                    </div>
+                </section>
             </div>
 
-            <div class="campo">
-                <label for="monto">Monto (S/):</label>
-                <input type="number" id="monto" required min="0.01" step="0.01"
-                       placeholder="0.00">
+            <!-- TOTAL A LA DERECHA -->
+            <div class="col-12 col-lg-5">
+                <section
+                    class="card border-0 shadow-sm resumen-gastos h-100"
+                >
+                    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <p class="text-secondary mb-2">
+                                <i class="bi bi-wallet2 me-2"></i>
+                                Total de gastos registrados
+                            </p>
+
+                            <h2
+                                id="total-gastos"
+                                class="display-5 fw-bold text-success mb-2"
+                            >
+                                S/ 0.00
+                            </h2>
+
+                            <small class="text-secondary">
+                                Suma de todos tus gastos
+                            </small>
+                        </div>
+
+                        <div class="icono-total ms-3">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+
+                    </div>
+                </section>
             </div>
 
-            <div class="campo">
-                <label for="categoria">Categoría:</label>
-                <select id="categoria" required>
-                    <option value="">-- Selecciona --</option>
-                    <option value="Alimentación">Alimentación</option>
-                    <option value="Transporte">Transporte</option>
-                    <option value="Ocio">Ocio</option>
-                    <option value="Salud">Salud</option>
-                </select>
+        </div>
+
+        <!-- FORMULARIO Y LISTA DE GASTOS -->
+        <div class="row g-4">
+
+            <!-- REGISTRAR GASTO -->
+            <div class="col-12 col-lg-6" id="registrar">
+                <section class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+
+                        <h2 class="h4 fw-bold mb-4">
+                            <i class="bi bi-plus-circle text-success me-2"></i>
+                            Registrar gasto
+                        </h2>
+
+                        <form id="form-gasto">
+
+                            <!-- DESCRIPCIÓN -->
+                            <div class="mb-3">
+                                <label
+                                    for="descripcion"
+                                    class="form-label fw-semibold"
+                                >
+                                    Descripción
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="descripcion"
+                                    required
+                                    maxlength="255"
+                                    placeholder="Ej. Almuerzo en el centro"
+                                >
+                            </div>
+
+                            <!-- MONTO -->
+                            <div class="mb-3">
+                                <label
+                                    for="monto"
+                                    class="form-label fw-semibold"
+                                >
+                                    Monto
+                                </label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text">S/</span>
+
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        id="monto"
+                                        required
+                                        min="0.01"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- CATEGORÍA -->
+                            <div class="mb-4">
+                                <label
+                                    for="categoria"
+                                    class="form-label fw-semibold"
+                                >
+                                    Categoría
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="categoria"
+                                    required
+                                >
+                                    <option value="">
+                                        Selecciona una categoría
+                                    </option>
+
+                                    <option value="Educación">
+                                        Educación
+                                    </option>
+
+                                    <option value="Alimentación">
+                                        Alimentación
+                                    </option>
+
+                                    <option value="Transporte">
+                                        Transporte
+                                    </option>
+
+                                    <option value="Ocio">
+                                        Ocio
+                                    </option>
+
+                                    <option value="Salud">
+                                        Salud
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- UBICACIÓN -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-geo-alt text-success me-1"></i>
+                                    Ubicación del gasto
+                                </label>
+
+                                <p
+                                    id="estado-ubicacion"
+                                    class="small text-secondary mb-2"
+                                >
+                                    Detectando tu ubicación...
+                                </p>
+
+                                <button
+                                    type="button"
+                                    id="btn-cambiar-ubicacion"
+                                    class="btn btn-outline-success btn-sm mb-3"
+                                >
+                                    <i class="bi bi-crosshair me-1"></i>
+                                    Cambiar ubicación
+                                </button>
+
+                                <div id="mapa-gasto"></div>
+
+                                <small
+                                    id="coordenadas-ubicacion"
+                                    class="text-secondary d-block mt-2"
+                                >
+                                    Esperando ubicación...
+                                </small>
+                            </div>
+
+                            <!-- GUARDAR -->
+                            <button
+                                type="submit"
+                                class="btn btn-success w-100 py-2 mt-3"
+                            >
+                                <i class="bi bi-save me-2"></i>
+                                Guardar gasto
+                            </button>
+
+                        </form>
+                    </div>
+                </section>
             </div>
 
-            <button type="submit" class="btn-primario">Guardar Gasto</button>
-        </form>
-    </section>
+            <!-- LISTA DE GASTOS -->
+            <div class="col-12 col-lg-6" id="lista">
+                <section class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
 
-    <section id="lista">
-        <h2>Mis Gastos</h2>
-        <ul id="lista-gastos">
-            <li class="vacio">No hay gastos registrados.</li>
-        </ul>
-    </section>
-</main>
+                        <h2 class="h4 fw-bold mb-4">
+                            <i class="bi bi-receipt text-success me-2"></i>
+                            Mis gastos
+                        </h2>
 
-<footer>
-    <p>&copy; 2026 GeoGasto - Proyecto Académico</p>
-</footer>
+                        <ul
+                            id="lista-gastos"
+                            class="list-group list-group-flush"
+                        >
+                            <li class="list-group-item text-center text-secondary py-4">
+                                Cargando gastos...
+                            </li>
+                        </ul>
 
-<script src="/js/app.js"></script>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="text-center text-white py-4 mt-4">
+        <div class="container">
+            <p class="mb-1 fw-semibold">GeoGasto</p>
+
+            <small class="text-white-50">
+                &copy; 2026 GeoGasto - Control inteligente de gastos
+            </small>
+        </div>
+    </footer>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- LEAFLET JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- JAVASCRIPT PROPIO -->
+    <script src="/js/app.js"></script>
+
 </body>
 </html>
